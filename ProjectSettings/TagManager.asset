@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
+  - EnemyPlayerCollider
   layers:
   - Default
   - TransparentFX
@@ -12,32 +14,41 @@ TagManager:
   - Water
   - UI
   - Background
+  - 
+  - 
+  - 
+  - 
   - Middleground
+  - Player
+  - 
+  - EnemyPassThroughLayer
+  - EnemyNonPassThroughLayer
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - Foreground
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   - 
   - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 2173359973
+    locked: 0
+  - name: Middleground
+    uniqueID: 975869277
+    locked: 0
+  - name: Foreground
+    uniqueID: 3193029829
     locked: 0
