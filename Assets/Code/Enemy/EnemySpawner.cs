@@ -14,7 +14,7 @@ public class EnemySpawner : MonoBehaviour
     void Start()
     {
         spawnTimerSecondsRemaining = _spawnPerSecond;
-        _enemyObject = Resources.Load<GameObject>("Enemies/BasicEnemy 2");
+        _enemyObject = Resources.Load<GameObject>("Enemies/BasicEnemy");
     }
 
     // Update is called once per frame

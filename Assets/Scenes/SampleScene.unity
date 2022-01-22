@@ -1118,6 +1118,9 @@ MonoBehaviour:
   _jumpForce: 10
   _iframeLengthSeconds: 0.5
   _health: 100
+  _xAccel: 150
+  _yAccel: 150
+  _decelerationRate: 150
 --- !u!58 &1951625462
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1147,14 +1150,14 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 1
+  m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 2
+  m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Constraints: 0
 --- !u!212 &1951625464
 SpriteRenderer:
   m_ObjectHideFlags: 0

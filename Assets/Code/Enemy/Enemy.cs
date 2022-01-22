@@ -10,7 +10,6 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float _xMaxSpeed = 3f;
     [SerializeField] private float _yMaxSpeed = 3f;
     [SerializeField] private float _xAccel = 0.1f;
-    [SerializeField] private float _ySpeed = 3f;
     [SerializeField] private float _yAccel = 0.1f;
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private LayerMask _layerMask;
@@ -24,10 +23,7 @@ public class Enemy : MonoBehaviour
     private enum State
     {
         Idle = 0,
-        Running = 1,
-        Jumping = 2,
-        Falling = 3,
-        Hurt = 4
+        Running = 1
     }
 
     // Start is called before the first frame update
@@ -47,16 +43,17 @@ public class Enemy : MonoBehaviour
     private void MoveToTarget()
     {
         SetXSpeed();
+        SetYSpeed();
         JumpIfNeeded();
     }
 
     private void JumpIfNeeded()
     {
         bool targetIsAbove = _target.transform.position.y > this.transform.position.y + _boxCollider.bounds.size.y / 2; //only jump if player is above the top of the box
-        if (IsGrounded() && (targetIsAbove || IsBlockedByWall()))
-        {
-            Jump();
-        }
+        //if (IsGrounded() && (targetIsAbove || IsBlockedByWall()))
+        //{
+        //    Jump();
+        //}
     }
 
     private void SetXSpeed()
@@ -89,29 +86,54 @@ public class Enemy : MonoBehaviour
             _rigidBody.velocity = new Vector2(xSpeed, _rigidBody.velocity.y);
         }
     }
+
+    private void SetYSpeed()
+    {
+        //Set horizontal speed
+        //if player is left of enemy
+        if (_target.transform.position.y < this.transform.position.y)
+        {
+            //current speed - accel*time
+            var ySpeed = _rigidBody.velocity.y - (_yAccel * Time.deltaTime);
+
+            //constrain to max speed
+            if (ySpeed < -_yMaxSpeed)
+            {
+                ySpeed = -_yMaxSpeed;
+            }
+
+            //set velocity
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, ySpeed);
+        }
+        //if player is right of enemy
+        else if (_target.transform.position.y > this.transform.position.y)
+        {
+            var ySpeed = _rigidBody.velocity.y + (_yAccel * Time.deltaTime);
+
+            if (ySpeed > _yMaxSpeed)
+            {
+                ySpeed = _yMaxSpeed;
+            }
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, ySpeed);
+        }
+    }
+
     private void SetState()
     {
-        if (!IsGrounded())
-        {
-            _state = _rigidBody.velocity.y > 0 ? State.Jumping : State.Falling;
-        }
-        else
-        {
-            _state = _rigidBody.velocity == Vector2.zero ? State.Idle : State.Running;
-        }
+        _state = _rigidBody.velocity == Vector2.zero ? State.Idle : State.Running;
     }
 
-    private void Jump()
-    {
-        _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _jumpForce);
-        _state = State.Jumping;
-    }
+    //private void Jump()
+    //{
+    //    _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _jumpForce);
+    //    _state = State.Jumping;
+    //}
 
-    private bool IsGrounded()
-    {
-        var raycastHit = Physics2D.Raycast(_boxCollider.bounds.center, Vector2.down, _boxCollider.bounds.extents.y + 0.1f, _layerMask);
-        return raycastHit.collider != null; ;
-    }
+    //private bool IsGrounded()
+    //{
+    //    var raycastHit = Physics2D.Raycast(_boxCollider.bounds.center, Vector2.down, _boxCollider.bounds.extents.y + 0.1f, _layerMask);
+    //    return raycastHit.collider != null; ;
+    //}
 
     private bool IsBlockedByWall()
     {

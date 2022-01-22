@@ -11,6 +11,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float _iframeLengthSeconds = 0.5f;
     [SerializeField] private int _health = 100;
 
+    [SerializeField] private float _xAccel = 5f;
+    [SerializeField] private float _yAccel = 5f;
+    [SerializeField] private float _decelerationRate = 10f;
+
     private Rigidbody2D _rigidBody;
     private Collider2D _boxCollider;
     private State _state;
@@ -30,18 +34,122 @@ public class Player : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         Movement();
     }
 
     private void Movement()
     {
-        SetXVelocity();
-        SetYVelocity();
+        SetYVelocityExact();
+        SetXVelocityExact();
     }
 
-    private void SetYVelocity()
+    private void SetYVelocityAccel()
+    {
+        var vDirection = Input.GetAxis("Vertical");
+
+        if (vDirection > 0)
+        {
+            //current speed - accel*time
+            var ySpeed = _rigidBody.velocity.y + (_yAccel * Time.deltaTime);
+
+            //constrain to max speed
+            if (ySpeed > _runSpeed)
+            {
+                ySpeed = _runSpeed;
+            }
+
+            //set velocity
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, ySpeed);
+        }
+        //if player is right of enemy
+        else if (vDirection < 0)
+        {
+            //current speed - accel*time
+            var ySpeed = _rigidBody.velocity.y - (_yAccel * Time.deltaTime);
+
+            //constrain to max speed
+            if (ySpeed < -_runSpeed)
+            {
+                ySpeed = -_runSpeed;
+            }
+
+            //set velocity
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, ySpeed);
+        }
+        else if (vDirection == 0)
+        {
+            if (Mathf.Abs(_rigidBody.velocity.y) < 0.05)
+            {
+                //Do Nothing
+            }
+            if (_rigidBody.velocity.y > 0)
+            {
+                var ySpeed = _rigidBody.velocity.y - _decelerationRate * Time.deltaTime;
+                _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, ySpeed);
+            }
+            else if (_rigidBody.velocity.y < 0)
+            {
+                var ySpeed = _rigidBody.velocity.y + _decelerationRate * Time.deltaTime;
+                _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, ySpeed);
+            }
+        }
+    }
+
+    private void SetXVelocityAccel()
+    {
+        var xDirection = Input.GetAxis("Horizontal");
+
+        if (xDirection > 0)
+        {
+            //current speed - accel*time
+            var xSpeed = _rigidBody.velocity.x + (_xAccel * Time.deltaTime);
+
+            //constrain to max speed
+            if (xSpeed > _runSpeed)
+            {
+                xSpeed = _runSpeed;
+            }
+
+            //set velocity
+            _rigidBody.velocity = new Vector2(xSpeed, _rigidBody.velocity.y);
+        }
+        //if player is right of enemy
+        else if (xDirection < 0)
+        {
+            //current speed - accel*time
+            var xSpeed = _rigidBody.velocity.x - (_xAccel * Time.deltaTime);
+
+            //constrain to max speed
+            if (xSpeed < -_runSpeed)
+            {
+                xSpeed = -_runSpeed;
+            }
+
+            //set velocity
+            _rigidBody.velocity = new Vector2(xSpeed, _rigidBody.velocity.y);
+        }
+        else if (xDirection == 0)
+        {
+            if (Mathf.Abs(_rigidBody.velocity.x) < 0.05)
+            {
+                //Do Nothing
+            }
+            if (_rigidBody.velocity.x > 0)
+            {
+                var xSpeed = _rigidBody.velocity.x - _decelerationRate * Time.deltaTime;
+                _rigidBody.velocity = new Vector2(xSpeed, _rigidBody.velocity.y);
+            }
+            else if (_rigidBody.velocity.x < 0)
+            {
+                var xSpeed = _rigidBody.velocity.x + _decelerationRate * Time.deltaTime;
+                _rigidBody.velocity = new Vector2(xSpeed, _rigidBody.velocity.y);
+            }
+        }
+    }
+
+    private void SetYVelocityExact()
     {
         var vDirection = Input.GetAxis("Vertical");
         if (vDirection < 0)
@@ -54,9 +162,13 @@ public class Player : MonoBehaviour
             _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _runSpeed);
             //transform.localScale = new Vector2(1, 1); //sets sprite direction
         }
+        else if (vDirection == 0)
+        {
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, 0);
+        }
     }
 
-    private void SetXVelocity()
+    private void SetXVelocityExact()
     {
         var hDirection = Input.GetAxis("Horizontal");
         
@@ -70,6 +182,10 @@ public class Player : MonoBehaviour
         {
             _rigidBody.velocity = new Vector2(_runSpeed, _rigidBody.velocity.y);
             //transform.localScale = new Vector2(1, 1); //sets sprite direction
+        }
+        else if (hDirection == 0)
+        {
+            _rigidBody.velocity = new Vector2(0, _rigidBody.velocity.y);
         }
     }
 
