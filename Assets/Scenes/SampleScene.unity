@@ -1149,6 +1149,7 @@ GameObject:
   - component: {fileID: 1951625463}
   - component: {fileID: 1951625462}
   - component: {fileID: 1951625461}
+  - component: {fileID: 1951625466}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1337,3 +1338,21 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0ce7423a77875674b9e90457c0e767be, type: 3}
+--- !u!114 &1951625466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951625460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54c225fa187d2204191e70f81543564f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemFontOffset: {x: 30, y: 20}
+  itemSpriteSize: 30
+  inventoryBoxSize: 50
+  inventoryBoxPadding: 5
+  inventoryFont: {fileID: 12800000, guid: 621e14ba8bfa00e40900b828683fc556, type: 3}
+  inventoryBox: {fileID: 2800000, guid: b5452cc804d377c48b4b04196f5c6940, type: 3}
