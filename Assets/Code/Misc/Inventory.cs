@@ -7,7 +7,13 @@ public class Inventory : IInventory
 {
     private int maxItems = 6;
     private int selectedSlot = 0;
-    public List<IItem> items = new List<IItem>();
+    public IItem[] items = new IItem[0];
+
+    public Inventory(int inventoryId)
+    {
+        items = new IItem[maxItems];
+        // LoadInventory(inventoryId);
+    }
 
     public void SetSelectedItem(int index)
     {
@@ -34,7 +40,7 @@ public class Inventory : IInventory
             if (existingItemInInventory.stackable())
                 existingItemInInventory.increaseCount(item.count());
             else
-                return SwapItem(item, existingItemInInventory);
+                return SwapItem(existingItemInInventory, item);
 
             return null;
         }
@@ -109,20 +115,27 @@ public class Inventory : IInventory
         return item;
     }
 
-    public void SaveInventory(List<IItem> items)
+    public void SaveInventory(int inventoryId, IItem[] items)
     {
         throw new System.NotImplementedException();
     }
 
-    public List<IItem> LoadInventory()
+    public IItem[] LoadInventory(int inventoryId)
     {
         throw new System.NotImplementedException();
     }
 
     public IItem GetExistingItem(int itemId)
     {
-        var exitingItem = items.SingleOrDefault((IItem i) => i.id() == itemId);
-        return exitingItem;
+        try
+        {
+            var exitingItem = items.SingleOrDefault((IItem i) => i != null && i.id() == itemId);
+            return exitingItem;
+        } catch(Exception ex)
+        {
+            Console.WriteLine(ex);
+            return null;
+        }
     }
 
     public int NextAvailableSlot()
@@ -140,5 +153,22 @@ public class Inventory : IInventory
             if (items[i] != null && items[i].id() == item.id()) return i;
 
         return -1;
+    }
+
+    public InventoryRenderItem[] Items()
+    {
+        var renderItems = new InventoryRenderItem[maxItems];
+        var i = 0;
+        foreach (IItem item in items)
+        {
+            var _ = new InventoryRenderItem
+            {
+                item = item,
+                selected = (i == selectedSlot)
+            };
+            renderItems[i] = _;
+            i++;
+        }
+        return renderItems;
     }
 }
