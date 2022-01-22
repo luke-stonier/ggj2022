@@ -1,16 +1,28 @@
 ﻿class Item : IItem
 {
     private int _id = -1;
+    private string _name = "NONE";
     private int _count = 0;
+    private bool _stackable = false;
+
+    public int id()
+    {
+        return _id;
+    }
+
+    public string name()
+    {
+        return _name;
+    }
 
     public int count()
     {
         return _count;
     }
 
-    public int id()
+    public bool stackable()
     {
-        return _id;
+        return _stackable;
     }
 
     public void increaseCount(int count)
