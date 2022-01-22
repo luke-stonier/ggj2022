@@ -10,7 +10,6 @@ public class Player : MonoBehaviour
     [SerializeField] private float _jumpForce = 5f;
     [SerializeField] private float _iframeLengthSeconds = 0.5f;
     [SerializeField] private int _health = 100;
-
     [SerializeField] private float _xAccel = 5f;
     [SerializeField] private float _yAccel = 5f;
     [SerializeField] private float _decelerationRate = 10f;
@@ -43,11 +42,14 @@ public class Player : MonoBehaviour
     {
         SetYVelocityExact();
         SetXVelocityExact();
+        //SetYVelocityAccel();
+        //SetXVelocityAccel();
+
     }
 
     private void SetYVelocityAccel()
     {
-        var vDirection = Input.GetAxis("Vertical");
+        var vDirection = Input.GetAxisRaw("Vertical");
 
         if (vDirection > 0)
         {
@@ -99,7 +101,7 @@ public class Player : MonoBehaviour
 
     private void SetXVelocityAccel()
     {
-        var xDirection = Input.GetAxis("Horizontal");
+        var xDirection = Input.GetAxisRaw("Horizontal");
 
         if (xDirection > 0)
         {
@@ -151,7 +153,7 @@ public class Player : MonoBehaviour
 
     private void SetYVelocityExact()
     {
-        var vDirection = Input.GetAxis("Vertical");
+        var vDirection = Input.GetAxisRaw("Vertical");
         if (vDirection < 0)
         {
             _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, -_runSpeed);
@@ -170,7 +172,7 @@ public class Player : MonoBehaviour
 
     private void SetXVelocityExact()
     {
-        var hDirection = Input.GetAxis("Horizontal");
+        var hDirection = Input.GetAxisRaw("Horizontal");
         
 
         if (hDirection < 0)
@@ -208,13 +210,38 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        HandleCollision(collision);
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        HandleCollision(collision);
+    }
+
+    private void HandleCollision(Collision2D collision)
+    {
         if (collision.gameObject.CompareTag("Enemy"))
         {
             HandleEnemyCollision(collision);
         }
     }
 
+    private void HandleEnemyCollision(Collision2D collision)
+    {
+        TakeDamage(collision.gameObject.GetComponent<Enemy>().DamageDealt);
+    }
+
     private void OnTriggerEnter2D(Collider2D collider)
+    {
+        HandleCollider(collider);
+    }
+
+    private void OnTriggerStay2D(Collider2D collider)
+    {
+        HandleCollider(collider);
+    }
+
+    private void HandleCollider(Collider2D collider)
     {
         if (collider.gameObject.CompareTag("Enemy"))
         {
@@ -224,11 +251,6 @@ public class Player : MonoBehaviour
         {
             TakeDamage(collider.gameObject.GetComponentInParent<Enemy>().DamageDealt);
         }
-    }
-
-    private void HandleEnemyCollision(Collision2D collision)
-    {
-        TakeDamage(collision.gameObject.GetComponent<Enemy>().DamageDealt);
     }
 
     private void TakeDamage(int damage)
