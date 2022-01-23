@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public class Inventory : IInventory
 {
@@ -12,7 +12,7 @@ public class Inventory : IInventory
     public Inventory(int inventoryId)
     {
         items = new IItem[maxItems];
-        // LoadInventory(inventoryId);
+        LoadInventory(inventoryId);
     }
 
     public void SetSelectedItem(int index)
@@ -33,12 +33,12 @@ public class Inventory : IInventory
     /// <returns></returns>
     public IItem AddItem(IItem item)
     {
-        var existingItemInInventory = GetExistingItem(item.id());
+        var existingItemInInventory = GetExistingItem(item.Id);
         if (existingItemInInventory != null)
         {
             // If we have the item and its stackable, increase count
-            if (existingItemInInventory.stackable())
-                existingItemInInventory.increaseCount(item.count());
+            if (existingItemInInventory.Stackable)
+                existingItemInInventory.increaseCount(item.Count);
             else
                 return SwapItem(existingItemInInventory, item);
 
@@ -77,14 +77,24 @@ public class Inventory : IInventory
         return oldItem;
     }
 
+    public IItem DropItem(int count = 1)
+    {
+        return DropItem(selectedSlot, count);
+    }
+
     public IItem DropItem(int index, int count = 1)
     {
         if (index <= -1 || index >= maxItems) return null;
         var itemToDrop = items[index];
         if (itemToDrop == null) return null;
-        if (itemToDrop.count() == 1) RemoveItem(index);
+        if (itemToDrop.Count == 1) RemoveItem(index);
         else itemToDrop.decreaseCount(count);
         return itemToDrop.droppedItemWithCount(count);
+    }
+
+    public IItem DropAllOfItem()
+    {
+        return DropAllOfItem(selectedSlot);
     }
 
     public IItem DropAllOfItem(int index)
@@ -115,21 +125,28 @@ public class Inventory : IInventory
         return item;
     }
 
-    public void SaveInventory(int inventoryId, IItem[] items)
+    public void SaveInventory(int inventoryId)
     {
-        throw new System.NotImplementedException();
+        var jsonInv = JsonConvert.SerializeObject(items);
+        PlayerPrefs.SetString($"inv_{inventoryId}", jsonInv);
     }
 
-    public IItem[] LoadInventory(int inventoryId)
+    public void LoadInventory(int inventoryId)
     {
-        throw new System.NotImplementedException();
+        var jsonInv = PlayerPrefs.GetString($"inv_{inventoryId}");
+        if (jsonInv == "{}"|| jsonInv == null || jsonInv == "") return;   // No inventory to load
+        var mapItems = JsonConvert.DeserializeObject<ItemSaveMap[]>(jsonInv);
+        for(var i = 0; i < mapItems.Length; i++)
+        {
+            items[i] = mapItems[i]?.MapToIItem();
+        }
     }
 
     public IItem GetExistingItem(int itemId)
     {
         try
         {
-            var exitingItem = items.SingleOrDefault((IItem i) => i != null && i.id() == itemId);
+            var exitingItem = items.SingleOrDefault((IItem i) => i != null && i.Id == itemId);
             return exitingItem;
         } catch(Exception ex)
         {
@@ -150,7 +167,7 @@ public class Inventory : IInventory
     public int GetIndexOfItem(IItem item)
     {
         for (var i = 0; i < maxItems; i++)
-            if (items[i] != null && items[i].id() == item.id()) return i;
+            if (items[i] != null && items[i].Id == item.Id) return i;
 
         return -1;
     }

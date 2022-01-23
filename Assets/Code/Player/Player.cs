@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(InventoryManager))]
 public class Player : MonoBehaviour
 {
     [SerializeField] private LayerMask _layerMask;
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Camera _camera;
 
     private Rigidbody2D _rigidBody;
+    private InventoryManager _inventoryManager;
     private Collider2D _boxCollider;
     private SpriteRenderer _spriteRenderer;
     private State _state;
@@ -307,5 +309,4 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(intervalTime);
         }
     }
-
 }

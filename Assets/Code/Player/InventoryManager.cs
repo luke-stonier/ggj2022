@@ -1,8 +1,16 @@
 using UnityEngine;
 
-public class InventoryManager : MonoBehaviour
+public class InventoryManager : MonoBehaviour, ICollector
 {
-    public IInventory inventory;
+    private IInventory _inventory;
+    public IInventory inventory {
+        get {
+            if (_inventory == null)
+                _inventory = new Inventory(0);
+
+            return _inventory;
+        }
+    }
     public InventoryRenderItem[] inventoryItems;
     
     [Header("UI")]
@@ -26,23 +34,41 @@ public class InventoryManager : MonoBehaviour
          KeyCode.Alpha9,
      };
 
+    // Inventory handling
+
+    public void PickUp(IItem item)
+    {
+        print($"PICK UP {item.entityResourceName} with count {item.Count}");
+        EntityService.Instantiate(inventory.AddItem(item));
+    }
+
+    // Unity handling
+
     private void Awake()
     {
-        inventory = new Inventory(0);   // default inventory for player is 0
         textStyle.font = inventoryFont;
+
+        inventory.AddItem(ItemList.STACK_TEST_ITEM);
     }
 
     private void Update() {
-        if (inventory != null) inventoryItems = inventory.Items();
-
-        if (Input.GetKeyDown(KeyCode.M))
-            inventory.AddItem(ItemList.STACK_TEST_ITEM.newItem());
-
-        if (Input.GetKeyDown(KeyCode.N))
-            inventory.AddItem(ItemList.NO_STACK_TEST_ITEM.newItem());
+        inventoryItems = inventory.Items();
 
         for (var i = 0; i < keyCodes.Length; i++)
             if (Input.GetKeyDown(keyCodes[i])) inventory.SetSelectedItem(i);
+
+        // Keybinds for inv interaction
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            var itemToDrop = inventory.DropItem();
+            print($"DROP {itemToDrop.entityResourceName} with count {itemToDrop.Count}");
+            EntityService.Instantiate(itemToDrop, transform.position);
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (inventory != null) inventory.SaveInventory(0);
     }
 
     private void OnGUI()
@@ -73,13 +99,13 @@ public class InventoryManager : MonoBehaviour
             GUI.DrawTexture(boxPos, inventoryBox, ScaleMode.ScaleToFit, true, 0, (item.selected ? Color.yellow : Color.white), 0, 0);
             if (item.item != null)
             {
-                GUI.DrawTexture(itemPos, item.item?.sprite(), ScaleMode.ScaleToFit);
-                if (item.item.count() > 1)
+                GUI.DrawTexture(itemPos, item.item?.Sprite, ScaleMode.ScaleToFit);
+                if (item.item.Count > 1)
                 {
                     textStyle.normal.textColor = Color.white;
                     textStyle.fontSize = 30;
                     textStyle.fontStyle = FontStyle.Normal;
-                    DrawOutline(itemCountPos, item.item.count().ToString(), 1, textStyle, Color.grey, Color.white);
+                    DrawOutline(itemCountPos, item.item.Count.ToString(), 1, textStyle, Color.grey, Color.white);
                 }
             }
             i++;
