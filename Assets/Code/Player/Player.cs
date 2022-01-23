@@ -14,12 +14,16 @@ public class Player : MonoBehaviour
     [SerializeField] private float _xAccel = 5f;
     [SerializeField] private float _yAccel = 5f;
     [SerializeField] private float _decelerationRate = 10f;
+    [SerializeField] private Camera _camera;
 
     private Rigidbody2D _rigidBody;
     private InventoryManager _inventoryManager;
     private Collider2D _boxCollider;
+    private SpriteRenderer _spriteRenderer;
     private State _state;
     private bool _isHurt;
+
+    Vector2 mousePos;
 
     private enum State
     {
@@ -32,12 +36,22 @@ public class Player : MonoBehaviour
     {
         _rigidBody = GetComponent<Rigidbody2D>();
         _boxCollider = GetComponent<Collider2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         Movement();
+        Rotation();
+    }
+
+    private void Rotation()
+    {
+        var mousePos = _camera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 lookDirecion = new Vector2(mousePos.x, mousePos.y) - _rigidBody.position;
+        float angle = Mathf.Atan2(lookDirecion.y, lookDirecion.x) * Mathf.Rad2Deg - 90f;
+        _rigidBody.rotation = angle;
     }
 
     private void Movement()
@@ -267,11 +281,32 @@ public class Player : MonoBehaviour
         _isHurt = true;
         _health -= damage;
         StartCoroutine(ResetIFrame());
+        StartCoroutine(DamageFlash(_iframeLengthSeconds, 0.2f));
     }
 
     private IEnumerator ResetIFrame()
     {
         yield return new WaitForSeconds(_iframeLengthSeconds);
         _isHurt = false;
+    }
+
+    private IEnumerator DamageFlash(float duration, float intervalTime)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            Debug.Log($"DamageFlash: ElapsedTime: {elapsedTime}");
+            _spriteRenderer.enabled = false;
+
+            elapsedTime += Time.deltaTime + intervalTime;
+            yield return new WaitForSeconds(intervalTime);
+
+            _spriteRenderer.enabled = true;
+
+            elapsedTime += Time.deltaTime + intervalTime;
+
+            yield return new WaitForSeconds(intervalTime);
+        }
     }
 }
