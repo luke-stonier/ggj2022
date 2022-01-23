@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(InventoryManager))]
 public class Player : MonoBehaviour
 {
     [SerializeField] private LayerMask _layerMask;
@@ -15,6 +16,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _decelerationRate = 10f;
 
     private Rigidbody2D _rigidBody;
+    private InventoryManager _inventoryManager;
     private Collider2D _boxCollider;
     private State _state;
     private bool _isHurt;
@@ -272,5 +274,4 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(_iframeLengthSeconds);
         _isHurt = false;
     }
-
 }
